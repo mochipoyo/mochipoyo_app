@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>もちぽよアプリラボ</title>
+<meta name="description" content="もちぽよが制作したブラウザアプリをまとめたページです。ゲーム、AIツール、ギター練習、宇宙の3Dナビなどを公開しています。">
+<meta property="og:title" content="もちぽよアプリラボ">
+<meta property="og:description" content="もちぽよが制作したブラウザアプリをまとめたページです。">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: 実験ノートの方眼の上に、アプリごとの「標本カード」を並べる。見出しは左寄せ、カードは2〜3列のグリッド */
+:root {
+  --bg: #F4F3F8;
+  --grid: rgba(40, 34, 90, 0.06);
+  --surface: #FFFFFF;
+  --ink: #1F1B3D;
+  --muted: #5E5A7A;
+  --line: #DEDBEA;
+  --accent: #D93C6E;
+  --accent-ink: #FFFFFF;
+  --font-display: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #13111F; --grid: rgba(200, 190, 255, 0.05); --surface: #1D1A2E; --ink: #ECEAF7;
+    --muted: #A29EBD; --line: #322E4A; --accent: #FF7FA6; --accent-ink: #1A0E14; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #13111F; --grid: rgba(200, 190, 255, 0.05); --surface: #1D1A2E; --ink: #ECEAF7;
+  --muted: #A29EBD; --line: #322E4A; --accent: #FF7FA6; --accent-ink: #1A0E14; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.75;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 48px 40px; }
+
+/* Header */
+.head { display: grid; gap: 18px; margin-bottom: 36px; }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+}
+h1 {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(2.2rem, 7vw, 4rem); line-height: 1.1; margin: 0;
+  letter-spacing: 0.01em; text-wrap: balance;
+}
+h1 .lab { color: var(--accent); }
+.lead { margin: 0; max-width: 40em; color: var(--muted); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.meta b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* Filter */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.chip {
+  font: 500 13px/1 var(--font-body); color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  padding: 9px 14px; cursor: pointer;
+}
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip .n { font-family: var(--font-mono); font-size: 11px; opacity: 0.7; margin-left: 4px; }
+.chip:focus-visible, .card:focus-visible, .foot a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.card {
+  display: flex; flex-direction: column; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  overflow: hidden; color: inherit; text-decoration: none;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.card:hover { transform: translateY(-3px); border-color: var(--app); box-shadow: 0 10px 28px -16px var(--app); }
+.plate { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: var(--bg); border-bottom: 1px solid var(--line); }
+.plate canvas, .plate img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.badge {
+  position: absolute; top: 12px; left: 12px; z-index: 1;
+  font: 500 11px/1 var(--font-mono); letter-spacing: 0.08em;
+  background: var(--accent); color: var(--accent-ink); padding: 6px 8px; border-radius: 6px;
+}
+.badge.soon { background: var(--ink); color: var(--bg); }
+.body { display: grid; gap: 10px; padding: 18px 20px 20px; flex: 1; align-content: start; }
+.kind { display: flex; align-items: center; gap: 8px; font: 500 12px/1 var(--font-mono); letter-spacing: 0.06em; color: var(--muted); }
+.kind i { width: 8px; height: 8px; border-radius: 50%; background: var(--app); display: inline-block; }
+.card h2 { margin: 0; font-size: 1.25rem; line-height: 1.4; font-weight: 700; text-wrap: balance; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.tags span { font-size: 12px; line-height: 1; padding: 6px 9px; border-radius: 6px; background: var(--bg); border: 1px solid var(--line); }
+.open {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 20px; border-top: 1px dashed var(--line);
+  font: 500 12px/1.2 var(--font-mono); color: var(--muted);
+}
+.open .url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.open .go { color: var(--app); white-space: nowrap; margin-left: 12px; font-weight: 700; }
+.card.is-soon { cursor: default; }
+.card.is-soon:hover { transform: none; box-shadow: none; border-color: var(--line); }
+.empty { color: var(--muted); padding: 40px 0; }
+
+/* Footer */
+.foot {
+  margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px;
+  font-size: 13px; color: var(--muted);
+}
+.foot nav { display: flex; flex-wrap: wrap; gap: 16px; }
+.foot a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
+.foot a:hover { text-decoration-color: var(--accent); }
+
+@media (max-width: 480px) { .wrap { padding-block: 32px 32px; padding-inline: 16px; } }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div class="eyebrow">Mochipoyo App Lab</div>
+    <h1>もちぽよ<br><span class="lab">アプリラボ</span></h1>
+    <p class="lead">もちぽよが作ったブラウザアプリの置き場です。インストール不要で、リンクを開けばそのまま使えます。</p>
+    <div class="meta"><span>収録 <b id="count">0</b> 本</span><span>最終更新 <b id="updated">—</b></span></div>
+  </header>
+
+  <div class="filters" id="filters" role="group" aria-label="カテゴリで絞り込む"></div>
+  <main class="grid" id="grid"></main>
+
+  <footer class="foot">
+    <span>© もちぽよ / 合同会社Trend One</span>
+    <nav>
+      <a href="https://x.com/mochi_fxtrader" target="_blank" rel="noopener">X</a>
+      <a href="https://www.youtube.com/@mochi_fxtrader" target="_blank" rel="noopener">YouTube</a>
+    </nav>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   アプリ一覧（ここだけ編集すれば追加・変更できます）
+   ------------------------------------------------------------
+   新しいアプリを追加するときは、下の { ... } を1つコピーして
+   配列の好きな位置に貼り、中身を書き換えてください。
+   並び順 = 表示順です。
+
+   title    : アプリ名
+   url      : 公開URL
+   category : カテゴリ名（同じ名前が自動で絞り込みボタンになります）
+   desc     : 説明文（1〜2文）
+   tags     : 特徴タグ（いくつでも）
+   color    : カードのアクセント色
+   motif    : カード上部の絵柄  road / prompt / fret / stars / default
+   image    : （任意）スクリーンショット画像のパス。指定すると絵柄の代わりに表示
+              例 image: "img/minami-drive.png"
+   isNew    : （任意）true で NEW バッジ
+   soon     : （任意）true で「準備中」表示。リンクは無効になります
+   hidden   : （任意）true で非表示
+   ============================================================ */
+const LAST_UPDATED = "2026-10-13";
+
+const APPS = [
+  {
+    title: "みなみ町ドライブ教習",
+    url: "https://mochipoyo.github.io/minami-drive/",
+    category: "ゲーム",
+    desc: "ブラウザで遊べる3Dの運転教習ゲーム。架空の町・都会・高速道路を走り、日本の交通ルールにそって採点されます。",
+    tags: ["3D", "交通ルール採点", "PC・スマホ対応"],
+    color: "#E0782F",
+    motif: "road"
+  },
+  {
+    title: "画像プロンプトメーカー",
+    url: "https://mochipoyo.github.io/image-prompt-maker2026/",
+    category: "AIツール",
+    desc: "用途・人物・雰囲気をボタンで選ぶだけで、画像生成AIや動画生成AIにそのまま貼れるプロンプトを作れる無料ツール。",
+    tags: ["画像・動画生成AI", "日本語 / English / 中文 / 한국어"],
+    color: "#7A5AF0",
+    motif: "prompt"
+  },
+  {
+    title: "フレットボード練習帳",
+    url: "https://mochipoyo.github.io/guitar-fretboard/",
+    category: "学習",
+    desc: "ギター指板の音名、スケール練習、TAB譜フレーズ、コード、CAGED、リズム、耳トレ、音楽理論をまとめて学べる練習アプリ。",
+    tags: ["ギター", "スケール", "耳トレ", "音楽理論"],
+    color: "#1F9E7A",
+    motif: "fret"
+  },
+  {
+    title: "宇宙実測ナビ",
+    url: "https://mochipoyo.github.io/cosmos-navi/",
+    category: "学習",
+    desc: "地球から観測可能な宇宙まで、観測データに基づいて3Dで旅するWebアプリ。人工衛星・航空機・船舶・天気のライブデータとガイドツアー付き。",
+    tags: ["3D", "観測データ", "ライブデータ", "ガイドツアー"],
+    color: "#3A7BEA",
+    motif: "stars"
+  }
+  // ↑ 追加するときは、直前の } の後ろに「,」を付けてから { ... } を貼ってください
+];
+
+/* ===== ここから下は表示用のプログラムです（通常は編集不要） ===== */
+(function () {
+  const apps = APPS.filter(a => !a.hidden);
+  const grid = document.getElementById("grid");
+  const filters = document.getElementById("filters");
+  document.getElementById("count").textContent = apps.filter(a => !a.soon).length;
+  document.getElementById("updated").textContent = LAST_UPDATED.replace(/-/g, ".");
+
+  const cats = ["すべて"];
+  apps.forEach(a => { if (a.category && !cats.includes(a.category)) cats.push(a.category); });
+  let current = "すべて";
+  try { const s = localStorage.getItem("applab-cat"); if (s && cats.includes(s)) current = s; } catch (e) {}
+
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+  function renderFilters() {
+    filters.innerHTML = "";
+    if (cats.length <= 2) { filters.hidden = true; return; }
+    cats.forEach(c => {
+      const n = c === "すべて" ? apps.length : apps.filter(a => a.category === c).length;
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.id = "chip-" + cats.indexOf(c);
+      b.setAttribute("aria-pressed", String(c === current));
+      b.innerHTML = esc(c) + '<span class="n">' + n + "</span>";
+      b.addEventListener("click", () => {
+        current = c;
+        try { localStorage.setItem("applab-cat", c); } catch (e) {}
+        renderFilters(); renderCards();
+      });
+      filters.appendChild(b);
+    });
+  }
+
+  function renderCards() {
+    const list = apps.filter(a => current === "すべて" || a.category === current);
+    grid.innerHTML = "";
+    if (!list.length) { grid.innerHTML = '<p class="empty">このカテゴリのアプリはまだありません。</p>'; return; }
+    list.forEach(a => {
+      const el = document.createElement(a.soon ? "div" : "a");
+      el.className = "card" + (a.soon ? " is-soon" : "");
+      el.style.setProperty("--app", a.color || "var(--accent)");
+      if (!a.soon) { el.href = a.url; el.target = "_blank"; el.rel = "noopener"; }
+      const badge = a.soon ? '<span class="badge soon">準備中</span>' : (a.isNew ? '<span class="badge">NEW</span>' : "");
+      const host = a.url ? a.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : "";
+      el.innerHTML =
+        '<div class="plate">' + badge +
+          (a.image ? '<img src="' + esc(a.image) + '" alt="" loading="lazy">' : '<canvas aria-hidden="true"></canvas>') +
+        "</div>" +
+        '<div class="body">' +
+          '<div class="kind"><i></i>' + esc(a.category) + "</div>" +
+          "<h2>" + esc(a.title) + "</h2>" +
+          "<p>" + esc(a.desc) + "</p>" +
+          '<div class="tags">' + (a.tags || []).map(t => "<span>" + esc(t) + "</span>").join("") + "</div>" +
+        "</div>" +
+        '<div class="open"><span class="url">' + esc(host) + '</span><span class="go">' + (a.soon ? "公開準備中" : "開く →") + "</span></div>";
+      const cv = el.querySelector("canvas");
+      if (cv) { cv._app = a; }
+      grid.appendChild(el);
+    });
+    drawAll();
+  }
+
+  /* ---- カード上部の絵柄 ---- */
+  function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function rand(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+  function seedOf(str) { let h = 7; for (const ch of String(str)) h = (h * 31 + ch.charCodeAt(0)) % 2147483647; return h || 1; }
+
+  const MOTIFS = {
+    road(c, w, h, col, ink, bg, r) {
+      const hz = h * 0.42;
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      c.globalAlpha = 0.14; c.fillStyle = col; c.fillRect(0, hz, w, h - hz); c.globalAlpha = 1;
+      // 町並み
+      c.fillStyle = col; c.globalAlpha = 0.35;
+      let x = 0; while (x < w) { const bw = 14 + r() * 34, bh = 10 + r() * h * 0.22; c.fillRect(x, hz - bh, bw - 4, bh); x += bw; }
+      c.globalAlpha = 1;
+      // 道路
+      const vx = w * 0.5;
+      c.fillStyle = ink; c.globalAlpha = 0.85;
+      c.beginPath(); c.moveTo(vx - 6, hz); c.lineTo(vx + 6, hz); c.lineTo(w * 0.86, h); c.lineTo(w * 0.14, h); c.closePath(); c.fill();
+      c.globalAlpha = 1;
+      // 中央線
+      c.fillStyle = col;
+      for (let i = 0; i < 7; i++) {
+        const t0 = Math.pow(i / 7, 1.8), t1 = Math.pow((i + 0.5) / 7, 1.8);
+        const y0 = hz + (h - hz) * t0, y1 = hz + (h - hz) * t1;
+        const w0 = 1 + 7 * t0, w1 = 1 + 7 * t1;
+        c.beginPath(); c.moveTo(vx - w0 / 2, y0); c.lineTo(vx + w0 / 2, y0); c.lineTo(vx + w1 / 2, y1); c.lineTo(vx - w1 / 2, y1); c.fill();
+      }
+      // 標識
+      c.fillStyle = col; c.beginPath(); c.arc(w * 0.82, hz - 4, Math.max(10, h * 0.07), 0, Math.PI * 2); c.fill();
+      c.fillStyle = bg; c.font = "700 " + Math.round(Math.max(10, h * 0.07)) + "px sans-serif"; c.textAlign = "center"; c.textBaseline = "middle";
+      c.fillText("30", w * 0.82, hz - 3);
+      c.fillStyle = ink; c.fillRect(w * 0.82 - 1.5, hz - 4 + Math.max(10, h * 0.07), 3, h * 0.12);
+    },
+    prompt(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const pad = w * 0.07, rows = 4, gap = h * 0.05, rh = (h - pad * 2 - gap * (rows - 1)) / rows;
+      for (let i = 0; i < rows; i++) {
+        let x = pad; const y = pad * 0.9 + i * (rh + gap);
+        while (x < w - pad) {
+          const bw = Math.min(w - pad - x, 40 + r() * 70);
+          if (bw < 30) break;
+          const on = r() < 0.3;
+          c.fillStyle = on ? col : ink; c.globalAlpha = on ? 0.9 : 0.08;
+          rr(c, x, y, bw - 8, rh, rh / 2); c.fill(); c.globalAlpha = 1;
+          if (!on) { c.strokeStyle = ink; c.globalAlpha = 0.18; c.lineWidth = 1; rr(c, x, y, bw - 8, rh, rh / 2); c.stroke(); c.globalAlpha = 1; }
+          x += bw;
+        }
+      }
+    },
+    fret(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const top = h * 0.18, bot = h * 0.82, L = w * 0.04, R = w * 0.96, frets = 9;
+      c.fillStyle = ink; c.globalAlpha = 0.06; c.fillRect(L, top, R - L, bot - top); c.globalAlpha = 1;
+      const fx = i => L + (R - L) * (i / frets);
+      c.strokeStyle = ink;
+      for (let i = 0; i <= frets; i++) { c.globalAlpha = i === 0 ? 0.8 : 0.3; c.lineWidth = i === 0 ? 4 : 1.5; c.beginPath(); c.moveTo(fx(i), top); c.lineTo(fx(i), bot); c.stroke(); }
+      c.globalAlpha = 0.18; c.fillStyle = ink;
+      [3, 5, 7].forEach(i => { c.beginPath(); c.arc((fx(i - 1) + fx(i)) / 2, (top + bot) / 2, 4, 0, Math.PI * 2); c.fill(); });
+      c.globalAlpha = 1;
+      const sy = s => top + (bot - top) * (s / 5);
+      for (let s = 0; s < 6; s++) { c.globalAlpha = 0.45; c.lineWidth = 1 + s * 0.35; c.beginPath(); c.moveTo(L, sy(s)); c.lineTo(R, sy(s)); c.stroke(); }
+      c.globalAlpha = 1;
+      // Aマイナーペンタ風の配置
+      const shape = [[5, 8], [5, 8], [5, 7], [5, 7], [5, 7], [5, 8]];
+      const rad = Math.max(5, (bot - top) / 12);
+      shape.forEach((fs, s) => fs.forEach(f => {
+        const idx = f - 4; if (idx < 1 || idx > frets) return;
+        const x = (fx(idx - 1) + fx(idx)) / 2, root = (f === 5 && (s === 0 || s === 5)) || (f === 7 && s === 3);
+        c.fillStyle = root ? ink : col; c.beginPath(); c.arc(x, sy(s), rad, 0, Math.PI * 2); c.fill();
+      }));
+    },
+    stars(c, w, h, col, ink, bg, r) {
+      const g = c.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, "#0B0F24"); g.addColorStop(1, "#1A1440");
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      for (let i = 0; i < 140; i++) { c.globalAlpha = 0.25 + r() * 0.75; c.fillStyle = "#FFFFFF"; const s = r() < 0.08 ? 1.8 : 0.9; c.fillRect(r() * w, r() * h, s, s); }
+      c.globalAlpha = 1;
+      const cx = w * 0.38, cy = h * 0.62, pr = h * 0.2;
+      c.strokeStyle = col; c.lineWidth = 1;
+      [1.6, 2.4, 3.4].forEach((k, i) => { c.globalAlpha = 0.55 - i * 0.12; c.beginPath(); c.ellipse(cx, cy, pr * k * 1.5, pr * k * 0.45, -0.25, 0, Math.PI * 2); c.stroke(); });
+      c.globalAlpha = 1;
+      const pg = c.createRadialGradient(cx - pr * 0.4, cy - pr * 0.4, pr * 0.1, cx, cy, pr);
+      pg.addColorStop(0, "#9CC4FF"); pg.addColorStop(1, col);
+      c.fillStyle = pg; c.beginPath(); c.arc(cx, cy, pr, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#FFFFFF"; c.beginPath(); c.arc(cx + pr * 2.4 * 1.5 * Math.cos(0.6), cy + pr * 2.4 * 0.45 * Math.sin(0.6) - 6, 3, 0, Math.PI * 2); c.fill();
+      // 遠方の銀河
+      const gx = w * 0.8, gy = h * 0.28;
+      const gg = c.createRadialGradient(gx, gy, 0, gx, gy, h * 0.16);
+      gg.addColorStop(0, "rgba(255,200,230,0.8)"); gg.addColorStop(1, "rgba(255,200,230,0)");
+      c.fillStyle = gg; c.beginPath(); c.ellipse(gx, gy, h * 0.2, h * 0.08, 0.5, 0, Math.PI * 2); c.fill();
+    },
+    default(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2;
+      for (let i = 6; i > 0; i--) { c.fillStyle = col; c.globalAlpha = 0.1 + (6 - i) * 0.08; c.beginPath(); c.arc(cx, cy, i * h * 0.07, 0, Math.PI * 2); c.fill(); }
+      c.globalAlpha = 1;
+    }
+  };
+  function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+
+  function drawAll() {
+    const ink = tok("--ink"), bg = tok("--bg");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    grid.querySelectorAll("canvas").forEach(cv => {
+      const a = cv._app, rect = cv.getBoundingClientRect();
+      const w = Math.max(1, rect.width), h = Math.max(1, rect.height);
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      const c = cv.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const fn = MOTIFS[a.motif] || MOTIFS.default;
+      fn(c, w, h, a.color || tok("--accent"), ink, bg, rand(seedOf(a.title)));
+    });
+  }
+
+  renderFilters(); renderCards();
+  let t; window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(drawAll, 120); });
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll); } catch (e) {}
+  new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+})();
+</script>
+</body>
+</html>
