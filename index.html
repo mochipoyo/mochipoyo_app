@@ -4,11 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>もちぽよアプリラボ</title>
-<meta name="description" content="もちぽよが制作したブラウザアプリをまとめたページです。ゲーム、AIツール、ギター練習、宇宙の3Dナビなどを公開しています。">
+<meta name="description" content="もちぽよが制作したブラウザアプリをまとめたページです。ゲーム、AIツール、ギター練習、宇宙の3Dナビ、FXトレード練習などを公開しています。">
 <meta property="og:title" content="もちぽよアプリラボ">
 <meta property="og:description" content="もちぽよが制作したブラウザアプリをまとめたページです。">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#141235">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
@@ -57,6 +61,8 @@ body {
 
 /* Header */
 .head { display: grid; gap: 18px; margin-bottom: 36px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand img { width: 40px; height: 40px; border-radius: 10px; display: block; }
 .eyebrow {
   font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
@@ -100,6 +106,9 @@ h1 .lab { color: var(--accent); }
   background: var(--accent); color: var(--accent-ink); padding: 6px 8px; border-radius: 6px;
 }
 .badge.soon { background: var(--ink); color: var(--bg); }
+.badges { position: absolute; top: 12px; left: 12px; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; }
+.badges .badge { position: static; }
+.badge.member { background: #F2C94C; color: #2A2108; }
 .body { display: grid; gap: 10px; padding: 18px 20px 20px; flex: 1; align-content: start; }
 .kind { display: flex; align-items: center; gap: 8px; font: 500 12px/1 var(--font-mono); letter-spacing: 0.06em; color: var(--muted); }
 .kind i { width: 8px; height: 8px; border-radius: 50%; background: var(--app); display: inline-block; }
@@ -135,7 +144,7 @@ h1 .lab { color: var(--accent); }
 <body>
 <div class="wrap">
   <header class="head">
-    <div class="eyebrow">Mochipoyo App Lab</div>
+    <div class="brand"><img src="favicon.svg" alt="" width="40" height="40"><span class="eyebrow">Mochipoyo App Lab</span></div>
     <h1>もちぽよ<br><span class="lab">アプリラボ</span></h1>
     <p class="lead">もちぽよが作ったブラウザアプリの置き場です。インストール不要で、リンクを開けばそのまま使えます。</p>
     <div class="meta"><span>収録 <b id="count">0</b> 本</span><span>最終更新 <b id="updated">—</b></span></div>
@@ -167,14 +176,15 @@ h1 .lab { color: var(--accent); }
    desc     : 説明文（1〜2文）
    tags     : 特徴タグ（いくつでも）
    color    : カードのアクセント色
-   motif    : カード上部の絵柄  road / prompt / fret / stars / default
+   motif    : カード上部の絵柄  road / prompt / fret / stars / dojo / portal / default
    image    : （任意）スクリーンショット画像のパス。指定すると絵柄の代わりに表示
               例 image: "img/minami-drive.png"
    isNew    : （任意）true で NEW バッジ
+   members  : （任意）true で「Fincs会員限定」バッジ
    soon     : （任意）true で「準備中」表示。リンクは無効になります
    hidden   : （任意）true で非表示
    ============================================================ */
-const LAST_UPDATED = "2026-10-13";
+const LAST_UPDATED = "2026-10-14";
 
 const APPS = [
   {
@@ -212,6 +222,26 @@ const APPS = [
     tags: ["3D", "観測データ", "ライブデータ", "ガイドツアー"],
     color: "#3A7BEA",
     motif: "stars"
+  },
+  {
+    title: "波形トレード道場",
+    url: "https://mochipoyo.github.io/hakei-dojo/",
+    category: "トレード",
+    desc: "架空の相場でトレード手法を練習できるゲーム。キャラクターを選び、クエストをクリアしてポイントを貯め、武器を買って取引数量を解放していきます。",
+    tags: ["架空相場", "A/B/C判定", "クエスト", "練習・実戦モード"],
+    color: "#E2A400",
+    motif: "dojo",
+    members: true
+  },
+  {
+    title: "もちぽよ マーケットポータル",
+    url: "https://mochipoyo.github.io/mochipoyo_fx-portal/",
+    category: "トレード",
+    desc: "FXの市況をまとめたポータル。チャート、通貨強弱、政策金利、経済指標カレンダー、投機筋ポジション、ニュースを1か所で確認できます。",
+    tags: ["FX市況", "経済指標", "通貨強弱", "ニュース"],
+    color: "#E0456A",
+    motif: "portal",
+    members: true
   }
   // ↑ 追加するときは、直前の } の後ろに「,」を付けてから { ... } を貼ってください
 ];
@@ -258,7 +288,10 @@ const APPS = [
       el.className = "card" + (a.soon ? " is-soon" : "");
       el.style.setProperty("--app", a.color || "var(--accent)");
       if (!a.soon) { el.href = a.url; el.target = "_blank"; el.rel = "noopener"; }
-      const badge = a.soon ? '<span class="badge soon">準備中</span>' : (a.isNew ? '<span class="badge">NEW</span>' : "");
+      const bs = [];
+      if (a.soon) bs.push('<span class="badge soon">準備中</span>'); else if (a.isNew) bs.push('<span class="badge">NEW</span>');
+      if (a.members) bs.push('<span class="badge member">Fincs会員限定</span>');
+      const badge = bs.length ? '<div class="badges">' + bs.join("") + "</div>" : "";
       const host = a.url ? a.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : "";
       el.innerHTML =
         '<div class="plate">' + badge +
@@ -368,6 +401,42 @@ const APPS = [
       const gg = c.createRadialGradient(gx, gy, 0, gx, gy, h * 0.16);
       gg.addColorStop(0, "rgba(255,200,230,0.8)"); gg.addColorStop(1, "rgba(255,200,230,0)");
       c.fillStyle = gg; c.beginPath(); c.ellipse(gx, gy, h * 0.2, h * 0.08, 0.5, 0, Math.PI * 2); c.fill();
+    },
+    dojo(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const n = 26, L = w * 0.05, R = w * 0.95, cw = (R - L) / n;
+      let p = h * 0.6; const pts = [];
+      for (let i = 0; i < n; i++) {
+        const o = p, d = (Math.sin(i / 3.2) * 0.9 + (r() - 0.5) * 1.4) * h * 0.06;
+        const cl = Math.min(h * 0.82, Math.max(h * 0.22, o - d));
+        const hi = Math.min(o, cl) - r() * h * 0.05, lo = Math.max(o, cl) + r() * h * 0.05;
+        const x = L + i * cw + cw / 2, up = cl < o;
+        c.strokeStyle = up ? col : ink; c.fillStyle = up ? col : ink; c.globalAlpha = up ? 1 : 0.5; c.lineWidth = 1;
+        c.beginPath(); c.moveTo(x, hi); c.lineTo(x, lo); c.stroke();
+        c.fillRect(x - cw * 0.32, Math.min(o, cl), cw * 0.64, Math.max(2, Math.abs(cl - o)));
+        pts.push([x, cl]); p = cl;
+      }
+      c.globalAlpha = 0.6; c.strokeStyle = ink; c.lineWidth = 1.5; c.beginPath();
+      let e = pts[0][1]; pts.forEach(([x, y], i) => { e = e + (y - e) * 0.3; i ? c.lineTo(x, e) : c.moveTo(x, e); }); c.stroke();
+      c.globalAlpha = 1;
+      const s = Math.max(28, h * 0.26), sx = w - s - w * 0.06, sy = h * 0.1;
+      c.fillStyle = col; c.beginPath(); c.arc(sx + s / 2, sy + s / 2, s / 2, 0, Math.PI * 2); c.fill();
+      c.fillStyle = bg; c.font = "700 " + Math.round(s * 0.55) + "px sans-serif"; c.textAlign = "center"; c.textBaseline = "middle";
+      c.fillText("A", sx + s / 2, sy + s / 2 + 1);
+    },
+    portal(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const cols = 4, rows = 3, pad = w * 0.04, g = 6;
+      const cw = (w - pad * 2 - g * (cols - 1)) / cols, ch = (h - pad * 2 - g * (rows - 1)) / rows;
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+        const x = pad + i * (cw + g), y = pad + j * (ch + g), v = r() - 0.45;
+        c.fillStyle = v > 0 ? "#2FBF84" : col; c.globalAlpha = 0.15 + Math.min(0.75, Math.abs(v) * 1.4);
+        rr(c, x, y, cw, ch, 6); c.fill(); c.globalAlpha = 1;
+        c.strokeStyle = ink; c.globalAlpha = 0.55; c.lineWidth = 1.2; c.beginPath();
+        let yy = y + ch * 0.55;
+        for (let k = 0; k <= 10; k++) { yy = Math.min(y + ch * 0.85, Math.max(y + ch * 0.2, yy + (r() - 0.5 + v * 0.3) * ch * 0.25)); const xx = x + cw * 0.1 + (cw * 0.8) * k / 10; k ? c.lineTo(xx, yy) : c.moveTo(xx, yy); }
+        c.stroke(); c.globalAlpha = 1;
+      }
     },
     default(c, w, h, col, ink, bg, r) {
       c.fillStyle = bg; c.fillRect(0, 0, w, h);
