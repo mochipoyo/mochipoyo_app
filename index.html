@@ -176,7 +176,7 @@ h1 .lab { color: var(--accent); }
    desc     : 説明文（1〜2文）
    tags     : 特徴タグ（いくつでも）
    color    : カードのアクセント色
-   motif    : カード上部の絵柄  road / prompt / fret / stars / dojo / portal / default
+   motif    : カード上部の絵柄  road / prompt / fret / stars / dojo / portal / runway / default
    image    : （任意）スクリーンショット画像のパス。指定すると絵柄の代わりに表示
               例 image: "img/minami-drive.png"
    isNew    : （任意）true で NEW バッジ
@@ -184,7 +184,7 @@ h1 .lab { color: var(--accent); }
    soon     : （任意）true で「準備中」表示。リンクは無効になります
    hidden   : （任意）true で非表示
    ============================================================ */
-const LAST_UPDATED = "2026-10-14";
+const LAST_UPDATED = "2026-10-15";
 
 const APPS = [
   {
@@ -242,6 +242,15 @@ const APPS = [
     color: "#E0456A",
     motif: "portal",
     members: true
+  },
+  {
+    title: "生活ランウェイ家計簿",
+    url: "https://mochipoyo.github.io/runway-kakeibo/",
+    category: "お金",
+    desc: "個人と法人の資産、毎月の支出から「あと何か月生活できるか」を計算する家計簿アプリ。手取りや法人の税金・社会保険料の概算、支出を見直したときのシミュレーションもできます。",
+    tags: ["生活可能月数", "個人＋法人", "税・社保の概算", "データはブラウザ内のみ"],
+    color: "#0F9DB0",
+    motif: "runway"
   }
   // ↑ 追加するときは、直前の } の後ろに「,」を付けてから { ... } を貼ってください
 ];
@@ -437,6 +446,24 @@ const APPS = [
         for (let k = 0; k <= 10; k++) { yy = Math.min(y + ch * 0.85, Math.max(y + ch * 0.2, yy + (r() - 0.5 + v * 0.3) * ch * 0.25)); const xx = x + cw * 0.1 + (cw * 0.8) * k / 10; k ? c.lineTo(xx, yy) : c.moveTo(xx, yy); }
         c.stroke(); c.globalAlpha = 1;
       }
+    },
+    runway(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const L = w * 0.08, R = w * 0.92, T = h * 0.16, B = h * 0.8, n = 24, zero = 19;
+      c.strokeStyle = ink; c.globalAlpha = 0.12; c.lineWidth = 1;
+      for (let k = 0; k <= 4; k++) { const y = T + (B - T) * k / 4; c.beginPath(); c.moveTo(L, y); c.lineTo(R, y); c.stroke(); }
+      c.globalAlpha = 1;
+      const X = i => L + (R - L) * i / n, pts = [];
+      let v = 1;
+      for (let i = 0; i <= n; i++) { pts.push([X(i), B - (B - T) * Math.max(0, v)]); v -= 1 / zero * (0.85 + r() * 0.3); }
+      c.fillStyle = col; c.globalAlpha = 0.16; c.beginPath(); c.moveTo(X(0), B);
+      pts.forEach(([x, y]) => c.lineTo(x, y)); c.lineTo(X(n), B); c.closePath(); c.fill(); c.globalAlpha = 1;
+      c.strokeStyle = col; c.lineWidth = 2.5; c.beginPath(); pts.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.stroke();
+      c.strokeStyle = ink; c.globalAlpha = 0.7; c.lineWidth = 2; c.beginPath(); c.moveTo(L, B); c.lineTo(R, B); c.stroke(); c.globalAlpha = 1;
+      const zx = X(zero); c.setLineDash([4, 4]); c.strokeStyle = ink; c.globalAlpha = 0.5; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(zx, T); c.lineTo(zx, B); c.stroke(); c.setLineDash([]); c.globalAlpha = 1;
+      c.fillStyle = ink; c.font = "700 " + Math.round(Math.max(11, h * 0.08)) + "px sans-serif"; c.textAlign = "center"; c.textBaseline = "bottom";
+      c.fillText(zero + "か月", zx, T - 2);
     },
     default(c, w, h, col, ink, bg, r) {
       c.fillStyle = bg; c.fillRect(0, 0, w, h);
