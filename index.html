@@ -176,7 +176,7 @@ h1 .lab { color: var(--accent); }
    desc     : 説明文（1〜2文）
    tags     : 特徴タグ（いくつでも）
    color    : カードのアクセント色
-   motif    : カード上部の絵柄  road / prompt / fret / stars / dojo / portal / runway / default
+   motif    : カード上部の絵柄  road / prompt / fret / stars / dojo / portal / runway / graph / default
    image    : （任意）スクリーンショット画像のパス。指定すると絵柄の代わりに表示
               例 image: "img/minami-drive.png"
    isNew    : （任意）true で NEW バッジ
@@ -251,6 +251,15 @@ const APPS = [
     tags: ["生活可能月数", "個人＋法人", "税・社保の概算", "データはブラウザ内のみ"],
     color: "#0F9DB0",
     motif: "runway"
+  },
+  {
+    title: "すうがく方眼ノート",
+    url: "https://mochipoyo.github.io/sugaku-hogan-note/",
+    category: "学習",
+    desc: "中1〜高3の数学33単元を「イメージ → 動かして実験 → チャレンジ問題」の流れで直感的に学べる無料の学習アプリ。",
+    tags: ["中1〜高3", "33単元", "動く図", "チャレンジ問題"],
+    color: "#2E7D32",
+    motif: "graph"
   }
   // ↑ 追加するときは、直前の } の後ろに「,」を付けてから { ... } を貼ってください
 ];
@@ -464,6 +473,26 @@ const APPS = [
       c.beginPath(); c.moveTo(zx, T); c.lineTo(zx, B); c.stroke(); c.setLineDash([]); c.globalAlpha = 1;
       c.fillStyle = ink; c.font = "700 " + Math.round(Math.max(11, h * 0.08)) + "px sans-serif"; c.textAlign = "center"; c.textBaseline = "bottom";
       c.fillText(zero + "か月", zx, T - 2);
+    },
+    graph(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const u = Math.max(12, h / 10), ox = w * 0.5, oy = h * 0.72;
+      c.strokeStyle = col; c.lineWidth = 1;
+      for (let x = ox % u; x < w; x += u) { c.globalAlpha = 0.14; c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+      for (let y = oy % u; y < h; y += u) { c.globalAlpha = 0.14; c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); }
+      c.globalAlpha = 0.7; c.strokeStyle = ink; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(0, oy); c.lineTo(w, oy); c.moveTo(ox, 0); c.lineTo(ox, h); c.stroke(); c.globalAlpha = 1;
+      const f = x => 0.5 * x * x - 2;
+      c.strokeStyle = col; c.lineWidth = 3; c.beginPath();
+      for (let px = 0; px <= w; px += 2) { const x = (px - ox) / u, y = oy - f(x) * u; px ? c.lineTo(px, y) : c.moveTo(px, y); }
+      c.stroke();
+      const x0 = 2, px0 = ox + x0 * u, py0 = oy - f(x0) * u, m = x0;
+      c.strokeStyle = ink; c.globalAlpha = 0.6; c.lineWidth = 1.5; c.setLineDash([5, 4]); c.beginPath();
+      c.moveTo(px0 - 2.2 * u, py0 + m * 2.2 * u); c.lineTo(px0 + 2.2 * u, py0 - m * 2.2 * u); c.stroke(); c.setLineDash([]); c.globalAlpha = 1;
+      c.fillStyle = col; c.beginPath(); c.arc(px0, py0, 6, 0, Math.PI * 2); c.fill();
+      c.fillStyle = bg; c.beginPath(); c.arc(px0, py0, 2.5, 0, Math.PI * 2); c.fill();
+      c.fillStyle = ink; c.font = "700 " + Math.round(Math.max(12, h * 0.09)) + "px serif"; c.textAlign = "left"; c.textBaseline = "top";
+      c.fillText("y = ½x² − 2", w * 0.05, h * 0.06);
     },
     default(c, w, h, col, ink, bg, r) {
       c.fillStyle = bg; c.fillRect(0, 0, w, h);
