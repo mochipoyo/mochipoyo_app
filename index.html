@@ -176,7 +176,7 @@ h1 .lab { color: var(--accent); }
    desc     : 説明文（1〜2文）
    tags     : 特徴タグ（いくつでも）
    color    : カードのアクセント色
-   motif    : カード上部の絵柄  road / prompt / fret / stars / dojo / portal / runway / graph / default
+   motif    : カード上部の絵柄  road / prompt / fret / stars / dojo / portal / runway / graph / eigo / default
    image    : （任意）スクリーンショット画像のパス。指定すると絵柄の代わりに表示
               例 image: "img/minami-drive.png"
    isNew    : （任意）true で NEW バッジ
@@ -184,7 +184,7 @@ h1 .lab { color: var(--accent); }
    soon     : （任意）true で「準備中」表示。リンクは無効になります
    hidden   : （任意）true で非表示
    ============================================================ */
-const LAST_UPDATED = "2026-10-15";
+const LAST_UPDATED = "2026-10-17";
 
 const APPS = [
   {
@@ -260,6 +260,15 @@ const APPS = [
     tags: ["中1〜高3", "33単元", "動く図", "チャレンジ問題"],
     color: "#2E7D32",
     motif: "graph"
+  },
+  {
+    title: "えいご4線ノート",
+    url: "https://mochipoyo.github.io/eigo-yonsen-note/",
+    category: "学習",
+    desc: "英会話ロールプレイ、文法、単語、TOEIC形式の演習を、聞いて・話して・並べて学べる英語学習アプリ。話せる英語とTOEIC 900点を目指す人向け。",
+    tags: ["英会話16シーン", "文法24単元", "単語約620語", "TOEIC形式"],
+    color: "#C8453B",
+    motif: "eigo"
   }
   // ↑ 追加するときは、直前の } の後ろに「,」を付けてから { ... } を貼ってください
 ];
@@ -493,6 +502,23 @@ const APPS = [
       c.fillStyle = bg; c.beginPath(); c.arc(px0, py0, 2.5, 0, Math.PI * 2); c.fill();
       c.fillStyle = ink; c.font = "700 " + Math.round(Math.max(12, h * 0.09)) + "px serif"; c.textAlign = "left"; c.textBaseline = "top";
       c.fillText("y = ½x² − 2", w * 0.05, h * 0.06);
+    },
+    eigo(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const gap = Math.max(7, h * 0.075), top = h * 0.3, L = w * 0.06, R = w * 0.94;
+      for (let k = 0; k < 4; k++) { const y = top + gap * k; c.strokeStyle = k === 2 ? col : ink; c.globalAlpha = k === 2 ? 0.75 : 0.2; c.lineWidth = k === 2 ? 1.5 : 1; c.beginPath(); c.moveTo(L, y); c.lineTo(R, y); c.stroke(); }
+      c.globalAlpha = 1; c.fillStyle = ink; c.textAlign = "left"; c.textBaseline = "alphabetic";
+      const msg = "Nice to meet you.", fam = "px 'Helvetica Neue', Arial, sans-serif";
+      let fs = gap * 2.7; c.font = "600 " + Math.round(fs) + fam;
+      const maxW = (R - L) * 0.92, mw = c.measureText(msg).width; if (mw > maxW) { fs *= maxW / mw; c.font = "600 " + Math.round(fs) + fam; }
+      c.fillText(msg, L + w * 0.02, top + gap * 2);
+      const bw = Math.max(64, w * 0.3), bh = Math.max(28, h * 0.17), bx = R - bw, by = top + gap * 3 + h * 0.08;
+      c.fillStyle = col; rr(c, bx, by, bw, bh, bh / 2); c.fill();
+      c.beginPath(); c.moveTo(bx + bw * 0.75, by + bh - 1); c.lineTo(bx + bw * 0.85, by + bh + bh * 0.35); c.lineTo(bx + bw * 0.62, by + bh - 1); c.fill();
+      c.fillStyle = bg; c.font = "700 " + Math.round(bh * 0.46) + "px 'Helvetica Neue', Arial, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle";
+      c.fillText("You too!", bx + bw / 2, by + bh / 2 + 1);
+      c.fillStyle = col; c.font = "700 " + Math.round(Math.max(11, h * 0.08)) + "px sans-serif"; c.textAlign = "left"; c.textBaseline = "top";
+      c.fillText("English ▶ Talk", L, h * 0.07);
     },
     default(c, w, h, col, ink, bg, r) {
       c.fillStyle = bg; c.fillRect(0, 0, w, h);
