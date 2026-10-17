@@ -269,6 +269,16 @@ const APPS = [
     tags: ["英会話16シーン", "文法24単元", "単語約620語", "TOEIC形式"],
     color: "#C8453B",
     motif: "eigo"
+  },
+  {
+    title: "星図と命式",
+    url: "https://mochipoyo.github.io/seizu-meishiki/",
+    category: "占い",
+    desc: "生年月日・時刻・出生地・名前から、四柱推命・算命学・西洋占星術・紫微斗数・九星気学・六星占術・数秘術・姓名判断・宿曜・マヤ暦などを計算し、共通する傾向と年運を総合判定する占いアプリ。",
+    tags: ["11占術", "ホロスコープ", "命式・命盤", "データはブラウザ内のみ"],
+    color: "#8A6A1F",
+    motif: "horoscope",
+    isNew: true
   }
   // ↑ 追加するときは、直前の } の後ろに「,」を付けてから { ... } を貼ってください
 ];
@@ -519,6 +529,24 @@ const APPS = [
       c.fillText("You too!", bx + bw / 2, by + bh / 2 + 1);
       c.fillStyle = col; c.font = "700 " + Math.round(Math.max(11, h * 0.08)) + "px sans-serif"; c.textAlign = "left"; c.textBaseline = "top";
       c.fillText("English ▶ Talk", L, h * 0.07);
+    },
+    horoscope(c, w, h, col, ink, bg, r) {
+      c.fillStyle = bg; c.fillRect(0, 0, w, h);
+      const cx = w * 0.5, cy = h * 0.52, R = Math.min(w, h) * 0.42, ri = R * 0.78, rc = R * 0.46;
+      c.strokeStyle = ink; c.globalAlpha = 0.6; c.lineWidth = 1.5; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.stroke();
+      c.globalAlpha = 0.3; c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, ri, 0, Math.PI * 2); c.stroke();
+      c.beginPath(); c.arc(cx, cy, rc, 0, Math.PI * 2); c.stroke();
+      for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; c.beginPath(); c.moveTo(cx + Math.cos(a) * rc, cy + Math.sin(a) * rc); c.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R); c.stroke(); }
+      c.globalAlpha = 1;
+      // 天体とアスペクト線
+      const pts = []; for (let i = 0; i < 7; i++) { const a = r() * Math.PI * 2; pts.push([cx + Math.cos(a) * (R + ri) / 2, cy + Math.sin(a) * (R + ri) / 2, cx + Math.cos(a) * rc, cy + Math.sin(a) * rc]); }
+      c.strokeStyle = col; c.globalAlpha = 0.55; c.lineWidth = 1.2;
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) if (r() < 0.3) { c.beginPath(); c.moveTo(pts[i][2], pts[i][3]); c.lineTo(pts[j][2], pts[j][3]); c.stroke(); }
+      c.globalAlpha = 1; c.fillStyle = col;
+      pts.forEach(p => { c.beginPath(); c.arc(p[0], p[1], Math.max(3, R * 0.055), 0, Math.PI * 2); c.fill(); });
+      // 命式の四柱
+      c.fillStyle = ink; c.font = "700 " + Math.round(Math.max(11, h * 0.085)) + "px serif"; c.textAlign = "left"; c.textBaseline = "bottom";
+      ["丙", "午"].forEach((t, i) => c.fillText(t, w * 0.05, h * 0.82 + i * h * 0.1));
     },
     default(c, w, h, col, ink, bg, r) {
       c.fillStyle = bg; c.fillRect(0, 0, w, h);
